@@ -1,0 +1,18 @@
+import { Router } from 'express';
+import upload from '../middlewares/multer.middleware';
+import PostController from '../controllers/post.cotroller';
+import { authMiddleware } from 'src/middlewares/authen.middleware';
+import { editPostValidator } from 'src/validators/post.validator';
+
+const postRouter = Router();
+
+// Route to create a post with media uploads
+postRouter.post('/', editPostValidator, authMiddleware, upload, PostController.createPost);
+postRouter.get('/user/:userId', authMiddleware, PostController.getPosts);
+postRouter.get('/search/:hashtag', authMiddleware, PostController.searchPosts);
+postRouter.post('/:postId/like', authMiddleware, PostController.likePost);
+postRouter.post('/:postId/bookmark', authMiddleware, PostController.bookmarkPost);
+postRouter.patch('/:postId/visibility', authMiddleware, PostController.changePostVisibility);
+postRouter.patch('/:postId/edit', editPostValidator, authMiddleware, upload, PostController.editPost);
+
+export default postRouter;
