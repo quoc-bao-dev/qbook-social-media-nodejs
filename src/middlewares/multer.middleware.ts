@@ -26,9 +26,9 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: Function) => {
     }
 };
 
-const upload = multer({
+const upload = (key: string = 'media') => multer({
     storage: storage,
     fileFilter: fileFilter,
-}).array('media', 10); // Accept multiple files up to 10
+}).array(key, 10); // Accept multiple files up to 10
 
 export default upload;

@@ -7,6 +7,6 @@ import upload from 'src/middlewares/multer.middleware';
 const storyRouter = express.Router();
 
 // Route để tạo story
-storyRouter.post('/', createStoryValidator, authMiddleware, upload, StoryController.createStory);
+storyRouter.post('/', createStoryValidator, authMiddleware, upload('media'), StoryController.createStory);
 
 export default storyRouter;

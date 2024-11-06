@@ -1,8 +1,8 @@
 // src/services/PostService.ts
-import { Request } from 'express';
-import PostModel, { IPostDocument } from '../models/post.schema';
-import mongoose, { Types } from 'mongoose';
+import mongoose from 'mongoose';
+import { CreatePostPayload } from 'src/controllers/post.cotroller';
 import { ForbiddenError, NotFoundError } from 'src/utils/errors';
+import PostModel, { IPostDocument } from '../models/post.schema';
 
 class PostService {
 
@@ -15,14 +15,9 @@ class PostService {
         const posts = await PostModel.find({ hashtags: { $in: [hashtag] } }).sort({ createdAt: -1 }).exec();
         return posts;
     }
-    async createPost(req: Request): Promise<IPostDocument> {
-        const { content, visibility, hashtags } = req.body;
-        const userId = req.user?.id;
-        // Kiểm tra kiểu của req.files
-        const media: string[] = Array.isArray(req.files)
-            ? req.files.map((file: Express.Multer.File) => file.filename)
-            : []; // Nếu không phải là mảng, gán media là mảng rỗng
-        // Validate input
+    async createPost(payload: CreatePostPayload): Promise<IPostDocument> {
+        const { content, media, visibility, hashtags, userId } = payload;
+
         if (!userId || !content) {
             throw new Error('User ID and content are required.');
         }

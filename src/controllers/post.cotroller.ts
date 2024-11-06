@@ -1,6 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import PostService from '../services/post.service';
 
+export type CreatePostPayload = {
+    userId: string;
+    content: string;
+    media: string[];
+    visibility: string;
+    hashtags: string[];
+}
+
 class PostController {
 
     async getPosts(req: Request, res: Response, next: NextFunction) {
@@ -18,7 +26,10 @@ class PostController {
     }
     async createPost(req: Request, res: Response, next: NextFunction) {
         try {
-            const newPost = await PostService.createPost(req);
+            const userId = req.user?.id as string;// Assume userId is passed as a URL parameter
+            const { content, media, visibility, hashtags } = req.body;
+            const payload: CreatePostPayload = { content, media, visibility, hashtags, userId };
+            const newPost = await PostService.createPost(payload);
             res.status(201).json({
                 status: 'success',
                 statusCode: 201,

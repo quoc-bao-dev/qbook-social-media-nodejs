@@ -7,12 +7,12 @@ import { editPostValidator } from 'src/validators/post.validator';
 const postRouter = Router();
 
 // Route to create a post with media uploads
-postRouter.post('/', editPostValidator, authMiddleware, upload, PostController.createPost);
+postRouter.post('/', editPostValidator, authMiddleware, PostController.createPost);
 postRouter.get('/user/:userId', authMiddleware, PostController.getPosts);
 postRouter.get('/search/:hashtag', authMiddleware, PostController.searchPosts);
 postRouter.post('/:postId/like', authMiddleware, PostController.likePost);
 postRouter.post('/:postId/bookmark', authMiddleware, PostController.bookmarkPost);
 postRouter.patch('/:postId/visibility', authMiddleware, PostController.changePostVisibility);
-postRouter.patch('/:postId/edit', editPostValidator, authMiddleware, upload, PostController.editPost);
+postRouter.patch('/:postId/edit', editPostValidator, authMiddleware, upload('media'), PostController.editPost);
 
 export default postRouter;
