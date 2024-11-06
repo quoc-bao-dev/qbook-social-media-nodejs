@@ -5,6 +5,17 @@ import AuthService from '../services/auth.service';
 import RefreshTokenService from '../services/refreshToken.service';
 import { UnauthorizedError } from '../utils/errors';
 class AuthController {
+
+    async getMe(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = req.user?.id as string;
+            const user = await AuthService.getUserInfo(userId);
+            const response = new ResponseBuilder(user, 'User fetched successfully').build()
+            res.status(200).json(response);
+        } catch (error) {
+            next(error);
+        }
+    }
     async login(req: Request, res: Response, next: NextFunction) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -38,6 +49,8 @@ class AuthController {
             const payload = { accessToken, refreshToken, user }
 
             const response = new ResponseBuilder(payload, 'User registered successfully', 201).build()
+            console.log(response);
+
 
             res.status(201).json(response);
         } catch (error: any) {

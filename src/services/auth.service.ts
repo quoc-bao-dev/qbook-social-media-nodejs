@@ -4,6 +4,16 @@ import User from '../models/user.schema';
 import RefreshTokenService from '../services/refreshToken.service';
 import { ForbiddenError } from '../utils/errors';
 class AuthService {
+
+    async getUserInfo(userId: string) {
+        const user = await User.findById(userId).select('-hashedPassword');
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        return user;
+    }
     async login(email: string, password: string) {
         const user = await User.findOne({ email })
 

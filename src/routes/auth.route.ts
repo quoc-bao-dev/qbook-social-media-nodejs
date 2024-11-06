@@ -5,6 +5,7 @@ import { authMiddleware } from 'src/middlewares/authen.middleware';
 
 const authRouter = express.Router();
 
+authRouter.get('/me', authMiddleware, AuthController.getMe);
 authRouter.post('/login', loginValidator, AuthController.login);
 authRouter.post('/register', registerValidator, AuthController.register);
 authRouter.post('/logout', authMiddleware, AuthController.logout);

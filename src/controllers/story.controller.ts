@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import StoryService, { IStoryPayload } from '../services/story.service';
+import { ResponseBuilder } from 'src/utils/response';
 
 class StoryController {
     async createStory(req: Request, res: Response, next: NextFunction) {
@@ -14,7 +15,8 @@ class StoryController {
             };
 
             const story = await StoryService.createStory(storyData);
-            res.status(201).json({ message: 'Story created successfully', story });
+            const response = new ResponseBuilder(story, 'Story created successfully', 201).build()
+            res.status(201).json(response);
         } catch (error) {
             next(error);
         }

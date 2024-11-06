@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import CommentService from '../services/comment.service';
+import { ResponseBuilder } from 'src/utils/response';
 
 class CommentController {
     async addComment(req: Request, res: Response, next: NextFunction) {
@@ -15,7 +16,8 @@ class CommentController {
             // Call CommentService to add the comment
             const comment = await CommentService.addComment(postId, userId, content);
 
-            res.status(201).json({ success: true, data: comment });
+            const response = new ResponseBuilder(comment, 'Comment added successfully', 201).build()
+            res.status(201).json(response);
         } catch (error) {
             next(error);
         }
@@ -27,7 +29,9 @@ class CommentController {
 
             const comments = await CommentService.getComments(postId);
 
-            res.status(200).json({ success: true, data: comments });
+            const response = new ResponseBuilder(comments, 'Comments fetched successfully').build()
+
+            res.status(200).json(response);
         } catch (error) {
             next(error); // Pass the error to the error handler
         }

@@ -1,13 +1,20 @@
 // src/services/PostService.ts
 import mongoose from 'mongoose';
-import { CreatePostPayload } from 'src/controllers/post.cotroller';
+import { CreatePostPayload } from 'src/controllers/post.controller';
 import { ForbiddenError, NotFoundError } from 'src/utils/errors';
 import PostModel, { IPostDocument } from '../models/post.schema';
 
 class PostService {
 
     async getPostsByUser(userId: string): Promise<IPostDocument[]> {
-        const posts = await PostModel.find({ userId }).sort({ createdAt: -1 }).exec();
+        const posts = await PostModel.find({ userId })
+            .populate({
+                path: 'userId',
+                select: 'username avatar',
+            })
+            .populate('likes', 'username avatar')
+            .populate('saves', 'username avatar')
+            .sort({ createdAt: -1 }).exec();
         return posts;
     }
 
@@ -57,7 +64,9 @@ class PostService {
 
         await post.save();
 
-        return post;
+        const result = await this.getPostById(postId);
+
+        return result;
     }
 
     async bookmarkPost(postId: string, userId: string): Promise<IPostDocument | null> {
@@ -137,6 +146,16 @@ class PostService {
         await post.save();
         return post;
     }
+
+    private async getPostById(postId: string): Promise<IPostDocument | null> {
+        return PostModel.findById(postId)
+            .populate('userId', 'username avatar')
+            .populate('likes', 'username avatar')
+            .populate('saves', 'username avatar')
+            .exec();
+    }
+
+
 }
 
 export default new PostService();

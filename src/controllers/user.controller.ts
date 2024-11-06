@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import UserService from '../services/user.service'; // Giả sử bạn đã tạo UserService
+import { ResponseBuilder } from 'src/utils/response';
 
 class UserController {
     async getUserInfo(req: Request, res: Response, next: NextFunction) {
@@ -12,7 +13,9 @@ class UserController {
                 next(new Error('User not found'));
             }
 
-            res.status(200).json(userInfo); // Trả về thông tin người dùng
+            const response = new ResponseBuilder(userInfo, 'User fetched successfully').build()
+
+            res.status(200).json(response); // Trả về thông tin người dùng
         } catch (error) {
             next(error); // Gọi next để xử lý lỗi
         }
@@ -41,7 +44,8 @@ class UserController {
                 next(new Error('User not updated'));
             }
 
-            res.status(200).json(updatedUser);
+            const response = new ResponseBuilder(updatedUser, 'User updated successfully').build()
+            res.status(200).json(response);
         } catch (error) {
             next(error);
         }

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import FriendService from '../services/friend.service';
 import mongoose from 'mongoose';
+import { ResponseBuilder } from 'src/utils/response';
 
 class FriendController {
   async sendFriendRequest(req: Request, res: Response, next: NextFunction) {
@@ -9,7 +10,9 @@ class FriendController {
       const targetId = new mongoose.Types.ObjectId(req.body.targetId);
 
       const friendRequest = await FriendService.sendFriendRequest(userId, targetId);
-      res.status(201).json({ message: 'Friend request sent', friendRequest });
+
+      const respone = new ResponseBuilder(friendRequest, 'Successfully sent friend request.', 201).build();
+      res.status(201).json(respone);
     } catch (error) {
       next(error);
     }
@@ -22,7 +25,8 @@ class FriendController {
 
 
       const friend = await FriendService.acceptFriendRequest(userId, requesterId);
-      res.status(200).json({ message: 'Friend request accepted', friend });
+      const respone = new ResponseBuilder(friend, 'Friend request accepted').build();
+      res.status(200).json(respone);
     } catch (error) {
       next(error);
     }
@@ -38,7 +42,8 @@ class FriendController {
       const requesterId = new mongoose.Types.ObjectId(req.body.requesterId);
 
       const result = await FriendService.rejectFriendRequest(userId, requesterId);
-      res.status(200).json({ message: 'Friend request rejected', result });
+      const respone = new ResponseBuilder(result, 'Friend request rejected').build();
+      res.status(200).json(respone);
     } catch (error) {
       next(error);
     }
@@ -49,7 +54,8 @@ class FriendController {
       const userId = new mongoose.Types.ObjectId(req.user?.id);
 
       const friends = await FriendService.getFriends(userId);
-      res.status(200).json({ friends });
+      const respone = new ResponseBuilder(friends, 'Successfully fetched friends').build();
+      res.status(200).json(respone);
     } catch (error) {
       next(error);
     }
@@ -61,7 +67,8 @@ class FriendController {
       const targetId = new mongoose.Types.ObjectId(req.body.targetId);
 
       await FriendService.removeFriend(userId, targetId);
-      res.status(200).json({ message: 'Friendship removed successfully' });
+      const respone = new ResponseBuilder({}, 'Successfully removed friend').build();
+      res.status(200).json(respone);
     } catch (error) {
       next(error);
     }

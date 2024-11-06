@@ -6,7 +6,7 @@ const followRouter = Router();
 
 followRouter.get('/followers/:userId', authMiddleware, followController.getFollowers);
 followRouter.post('/follow', authMiddleware, followController.followUser)
-followRouter.delete('/unfollow', authMiddleware, followController.unfollowUser);
+followRouter.post('/unfollow', authMiddleware, followController.unfollowUser);
 
 
 export default followRouter

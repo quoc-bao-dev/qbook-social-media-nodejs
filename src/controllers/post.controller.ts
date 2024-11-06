@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import PostService from '../services/post.service';
+import { ResponseBuilder } from 'src/utils/response';
 
 export type CreatePostPayload = {
     userId: string;
@@ -14,12 +15,24 @@ class PostController {
     async getPosts(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = req.user?.id as string;// Assume userId is passed as a URL parameter
-            const posts = await PostService.getPostsByUser(userId);
-            res.status(200).json({
-                status: 'success',
-                statusCode: 200,
-                posts,
-            });
+            const result = await PostService.getPostsByUser(userId);
+
+            const response = new ResponseBuilder(result, 'Posts fetched successfully').build()
+
+            res.status(200).json(response);
+
+        } catch (error) {
+            next(error); // Pass the error to the next middleware (error handler)
+        }
+    }
+
+    async getPostByUserId(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = req.params.userId as string;// Assume userId is passed as a URL parameter
+            const result = await PostService.getPostsByUser(userId);
+            const response = new ResponseBuilder(result, 'Posts fetched successfully').build()
+
+            res.status(200).json(response);
         } catch (error) {
             next(error); // Pass the error to the next middleware (error handler)
         }
@@ -30,11 +43,10 @@ class PostController {
             const { content, media, visibility, hashtags } = req.body;
             const payload: CreatePostPayload = { content, media, visibility, hashtags, userId };
             const newPost = await PostService.createPost(payload);
-            res.status(201).json({
-                status: 'success',
-                statusCode: 201,
-                post: newPost,
-            });
+
+            const response = new ResponseBuilder(newPost, 'Post created successfully', 201).build()
+
+            res.status(201).json(response);
         } catch (error) {
             next(error); // Pass the error to the next middleware (error handler)
         }
@@ -58,7 +70,9 @@ class PostController {
                 hashtags
             });
 
-            res.status(200).json({ success: true, data: updatedPost });
+            const response = new ResponseBuilder(updatedPost, 'Post updated successfully').build()
+
+            res.status(200).json(response);
         } catch (error) {
             next(error);
         }
@@ -68,11 +82,10 @@ class PostController {
         try {
             const { hashtag } = req.params; // Assume hashtag is passed as a URL parameter
             const posts = await PostService.searchPostsByHashtag(hashtag);
-            res.status(200).json({
-                status: 'success',
-                statusCode: 200,
-                posts,
-            });
+
+            const response = new ResponseBuilder(posts, 'Posts fetched successfully').build()
+
+            res.status(200).json(response);
         } catch (error) {
             next(error); // Pass the error to the next middleware (error handler)
         }
@@ -85,12 +98,10 @@ class PostController {
 
             //   const userId = req.user.id; // Assume userId is obtained from authenticated user data
             const post = await PostService.likePost(postId, userId);
-            res.status(200).json({
-                status: 'success',
-                statusCode: 200,
-                message: 'Post liked successfully',
-                post,
-            });
+
+            const response = new ResponseBuilder(post, 'Post liked successfully').build()
+
+            res.status(200).json(response);
         } catch (error) {
             next(error);
         }
@@ -102,12 +113,8 @@ class PostController {
             const userId = req.user?.id as string;
 
             const post = await PostService.bookmarkPost(postId, userId);
-            res.status(200).json({
-                status: 'success',
-                statusCode: 200,
-                message: 'Post bookmarked successfully',
-                post,
-            });
+            const response = new ResponseBuilder(post, 'Post bookmarked successfully').build()
+            res.status(200).json(response);
         } catch (error) {
             next(error);
         }
@@ -119,12 +126,8 @@ class PostController {
             const { visibility, userId } = req.body; // New visibility status from the request body
 
             const post = await PostService.changePostVisibility(postId, userId, visibility);
-            res.status(200).json({
-                status: 'success',
-                statusCode: 200,
-                message: 'Post visibility updated successfully',
-                post,
-            });
+            const response = new ResponseBuilder(post, 'Post visibility updated successfully').build()
+            res.status(200).json(response);
         } catch (error) {
             next(error);
         }
